@@ -1,0 +1,12 @@
+input {
+  display: block;
+}
+
+#coordinates {
+  border: 1px solid black;
+  width: fit-content;
+}
+
+#map {
+  border: 1px solid black;
+}

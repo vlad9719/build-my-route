@@ -1,9 +1,16 @@
 const form = document.getElementById("coordinates");
 form.addEventListener("submit", submitCoordinates);
 
+const button = document.getElementById("set-current-location");
+button.addEventListener("click", setCurrentLocation);
+
 function submitCoordinates(event) {
   reloadMapWithNewCoordinates();
   event.preventDefault();
+}
+
+function setCurrentLocation() {
+  navigator.geolocation.getCurrentPosition(setCurrentPosition)
 }
 
 function reloadMapWithNewCoordinates() {
@@ -13,6 +20,11 @@ function reloadMapWithNewCoordinates() {
   const finishLongitude = getFinishLongitude();
   const finishLatitude = getFinishLatitude();
   mapIframe.src = `https://routing.openstreetmap.de/?z=15&center=${getCenterLongitude(startLongitude, finishLongitude)}%2C${getCenterLatitude(startLatitude, finishLatitude)}&loc=${startLatitude}%2C${startLongitude}&loc=${finishLatitude}%2C${finishLongitude}&hl=en&alt=0&srv=2&amp;layer=mapnik`;
+}
+
+function setCurrentPosition(position) {
+  setStartLongitude(position);
+  setStartLatitude(position);
 }
 
 function getCenterLongitude(startLongitude, finishLongitude) {
@@ -28,21 +40,47 @@ function getAverageOfTwo(first, second) {
 }
 
 function getStartLongitude() {
-  const startLongitudeInput = document.getElementById("start-longitude");
+  const startLongitudeInput = getStartLongitudeInput();
   return startLongitudeInput.value;
 }
 
 function getStartLatitude() {
-  const startLatitudeInput = document.getElementById("start-latitude");
+  const startLatitudeInput = getStartLatitudeInput();
   return startLatitudeInput.value;
 }
 
 function getFinishLongitude() {
-  const finishLongitudeInput = document.getElementById("finish-longitude");
+  const finishLongitudeInput = getFinishLongitudeInput();
   return finishLongitudeInput.value;
 }
 
 function getFinishLatitude() {
-  const finishLatitudeInput = document.getElementById("finish-latitude");
+  const finishLatitudeInput = getFinishLatitudeInput();
   return finishLatitudeInput.value;
+}
+
+function setStartLongitude(position) {
+  const startLongitudeInput = getStartLongitudeInput();
+  startLongitudeInput.value = position.coords.longitude;
+}
+
+function setStartLatitude(position) {
+  const startLatitudeInput = getStartLatitudeInput();
+  startLatitudeInput.value = position.coords.latitude;
+}
+
+function getStartLongitudeInput() {
+  return document.getElementById("start-longitude");
+}
+
+function getStartLatitudeInput() {
+  return document.getElementById("start-latitude");
+}
+
+function getFinishLongitudeInput() {
+  return document.getElementById("finish-longitude");
+}
+
+function getFinishLatitudeInput() {
+  return document.getElementById("finish-latitude");
 }

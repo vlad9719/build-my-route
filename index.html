@@ -2,6 +2,7 @@
 
 <head>
   <title>Build My Route</title>
+  <link rel="stylesheet" href="index.css">
 </head>
 
 <body>
@@ -11,20 +12,17 @@
     <input id="start-longitude" type="text" value="13.261871" />
     <label for="start-latitude">Enter start point latitude</label>
     <input id="start-latitude" type="text" value="52.500758" />
+    <input type="button" id="set-current-location" value="Set current location" />
     <label for="finish-longitude">Enter finish point longitude</label>
     <input id="finish-longitude" type="text" value="13.284531" />
     <label for="finish-latitude">Enter finish point latitude</label>
     <input id="finish-latitude" type="text" value="52.508699" />
     <button id="generate" type="submit">Generate route!</button>
   </form>
-  <iframe id="map" width="1000" height="700" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" <!--
-    src="https://routing.openstreetmap.de/?z=15&center=52.500758%2C13.261871&loc=53.500758%2C13.261871&loc=52.508699%2C13.284531&hl=en&alt=0&srv=2&amp;layer=mapnik"
-    -->
-    style="border: 1px solid black"></iframe>
+  <iframe id="map" width="1000" height="700" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"
+    src="https://routing.openstreetmap.de/?z=15&center=52.500758%2C13.261871&loc=53.500758%2C13.261871&loc=52.508699%2C13.284531&hl=en&alt=0&srv=2&amp;layer=mapnik"></iframe>
   <br /><small><a href="https://www.openstreetmap.org/#map=12/17.0759/-61.8260">View Larger Map</a></small>
   <script src="index.js"></script>
 </body>
 
 </html>
-
-//${getCenterLatitude(startLatitude, finishLongitude)}
