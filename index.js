@@ -17,12 +17,17 @@ function setCurrentLocation() {
 }
 
 function loadMapWithRoute() {
-  const startLongitude = getStartLongitude();
-  const startLatitude = getStartLatitude();
-  const finishLongitude = getFinishLongitude();
-  const finishLatitude = getFinishLatitude();
+  const mapUrl = generateRouteMapUrl();
+  changeMapIframeUrl(mapUrl);
+}
+
+function generateRouteMapUrl() {
+  const routeCoords = getRouteCoords();
+  return getMapUrl(routeCoords);
+}
+
+function changeMapIframeUrl(mapUrl) {
   const mapIframe = document.getElementById("map");
-  const mapUrl = `https://routing.openstreetmap.de/?z=15&center=${getCenterLongitude(startLongitude, finishLongitude)}%2C${getCenterLatitude(startLatitude, finishLatitude)}&loc=${startLatitude}%2C${startLongitude}&loc=${finishLatitude}%2C${finishLongitude}&hl=en&alt=0&srv=2&amp;layer=mapnik`;
   mapIframe.src = mapUrl;
 }
 
@@ -31,16 +36,35 @@ function setCurrentPosition(position) {
   setStartLatitude(position);
 }
 
-function getCenterLongitude(startLongitude, finishLongitude) {
-  return getAverageOfTwo(startLongitude, finishLongitude);
+function getCenterLongitude(routeCoords) {
+  const longitudes = routeCoords.map(coord => coord.longitude);
+  const minLongitude = Math.min(...longitudes);
+  const maxLongitude = Math.max(...longitudes);
+  return getAverageOfTwo(minLongitude, maxLongitude);
 }
 
-function getCenterLatitude(startLatitude, finishLatitude) {
-  return getAverageOfTwo(startLatitude, finishLatitude);
+function getCenterLatitude(routeCoords) {
+  const latitudes = routeCoords.map(coord => coord.latitude);
+  const minLatitude = Math.min(...latitudes);
+  const maxLatitude = Math.max(...latitudes);
+  return getAverageOfTwo(minLatitude, maxLatitude);
 }
 
 function getAverageOfTwo(first, second) {
   return (parseInt(first) + parseInt(second)) / 2;
+}
+
+function getRouteCoords() {
+  const startLongitude = getStartLongitude();
+  const startLatitude = getStartLatitude();
+  const finishLongitude = getFinishLongitude();
+  const finishLatitude = getFinishLatitude();
+  const routeCoords = [{ latitude: startLatitude, longitude: startLongitude }, { latitude: finishLatitude, longitude: finishLongitude }];
+  return routeCoords;
+}
+
+function getMapUrl(routeCoords) {
+  return `https://routing.openstreetmap.de/?z=15&center=${getCenterLongitude(routeCoords)}%2C${getCenterLatitude(routeCoords)}${routeCoords.map(coord => `&loc=${coord.latitude}%2C${coord.longitude}`)}&hl=en&alt=0&srv=2&amp;layer=mapnik`;
 }
 
 function getStartLongitude() {
