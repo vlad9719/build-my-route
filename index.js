@@ -30,6 +30,11 @@ function loadMapWithRoute() {
   changeMapIframeUrl(mapUrl);
 }
 
+function setCurrentPosition(position) {
+  setStartLongitude(position);
+  setStartLatitude(position);
+}
+
 function generateRouteMapUrl() {
   const routeCoords = getRouteCoords();
   return getMapUrl(routeCoords);
@@ -40,9 +45,50 @@ function changeMapIframeUrl(mapUrl) {
   mapIframe.src = mapUrl;
 }
 
-function setCurrentPosition(position) {
-  setStartLongitude(position);
-  setStartLatitude(position);
+function setStartLongitude(position) {
+  const startLongitudeInput = getStartLongitudeInput();
+  startLongitudeInput.value = position.coords.longitude;
+}
+
+function setStartLatitude(position) {
+  const startLatitudeInput = getStartLatitudeInput();
+  startLatitudeInput.value = position.coords.latitude;
+}
+
+function getRouteCoords() {
+  markAllStrategiesUnusedIfNeeded(strategies);
+  let currentStrategyIndex = 0;
+  while (currentStrategyIndex < strategies.length) {
+    if (strategies[currentStrategyIndex].isUsed) {
+      currentStrategyIndex++;
+    } else {
+      return getStrategyRouteCoordsByIndexAndMarkStrategyAsUsed(currentStrategyIndex);
+    }
+  }
+}
+
+function getMapUrl(routeCoords) {
+  return `https://routing.openstreetmap.de/?z=15&center=${getCenterLongitude(routeCoords)}%2C${getCenterLatitude(routeCoords)}${routeCoords.map(coord => `&loc=${coord.latitude}%2C${coord.longitude}`)}&hl=en&alt=0&srv=2&amp;layer=mapnik`;
+}
+
+function getStartLongitudeInput() {
+  return document.getElementById("start-longitude");
+}
+
+function getStartLatitudeInput() {
+  return document.getElementById("start-latitude");
+}
+
+function markAllStrategiesUnusedIfNeeded(strategies) {
+  if (isAllStrategiesUsed(strategies)) {
+    markAllStrategiesUnused(strategies);
+  }
+}
+
+function getStrategyRouteCoordsByIndexAndMarkStrategyAsUsed(strategyIndex) {
+  const routeCoords = strategies[strategyIndex].getRouteCoordinates({ latitude: getStartLatitude(), longitude: getStartLongitude() });
+  strategies[strategyIndex].isUsed = true;
+  return routeCoords;
 }
 
 function getCenterLongitude(routeCoords) {
@@ -59,31 +105,6 @@ function getCenterLatitude(routeCoords) {
   return getAverageOfTwo(minLatitude, maxLatitude);
 }
 
-function getAverageOfTwo(first, second) {
-  return (parseInt(first) + parseInt(second)) / 2;
-}
-
-function getRouteCoords() {
-  const startCoords = { latitude: getStartLatitude(), longitude: getStartLongitude() };
-  markAllStrategiesUnusedIfNeeded(strategies);
-  let currentStrategyIndex = 0;
-  while (currentStrategyIndex < strategies.length) {
-    if (strategies[currentStrategyIndex].isUsed) {
-      currentStrategyIndex++;
-    } else {
-      const routeCoords = strategies[currentStrategyIndex].getRouteCoordinates(startCoords);
-      strategies[currentStrategyIndex].isUsed = true;
-      return routeCoords;
-    }
-  }
-}
-
-function markAllStrategiesUnusedIfNeeded(strategies) {
-  if (isAllStrategiesUsed(strategies)) {
-    markAllStrategiesUnused(strategies);
-  }
-}
-
 function isAllStrategiesUsed(strategies) {
   return strategies.every(strategy => strategy.isUsed);
 }
@@ -92,8 +113,9 @@ function markAllStrategiesUnused(strategies) {
   strategies = strategies.map(strategy => strategy.isUsed = false);
 }
 
-function getMapUrl(routeCoords) {
-  return `https://routing.openstreetmap.de/?z=15&center=${getCenterLongitude(routeCoords)}%2C${getCenterLatitude(routeCoords)}${routeCoords.map(coord => `&loc=${coord.latitude}%2C${coord.longitude}`)}&hl=en&alt=0&srv=2&amp;layer=mapnik`;
+function getStartLatitude() {
+  const startLatitudeInput = getStartLatitudeInput();
+  return startLatitudeInput.value;
 }
 
 function getStartLongitude() {
@@ -101,27 +123,8 @@ function getStartLongitude() {
   return startLongitudeInput.value;
 }
 
-function getStartLatitude() {
-  const startLatitudeInput = getStartLatitudeInput();
-  return startLatitudeInput.value;
-}
-
-function setStartLongitude(position) {
-  const startLongitudeInput = getStartLongitudeInput();
-  startLongitudeInput.value = position.coords.longitude;
-}
-
-function setStartLatitude(position) {
-  const startLatitudeInput = getStartLatitudeInput();
-  startLatitudeInput.value = position.coords.latitude;
-}
-
-function getStartLongitudeInput() {
-  return document.getElementById("start-longitude");
-}
-
-function getStartLatitudeInput() {
-  return document.getElementById("start-latitude");
+function getAverageOfTwo(first, second) {
+  return (parseInt(first) + parseInt(second)) / 2;
 }
 
 // route strategies
@@ -138,18 +141,6 @@ function getGoNorthAndBackRouteCoords(startCoords) {
   return routeCoords;
 }
 
-function getForwardAndBackRouteNorthPointLatitude(startLatitude) {
-  const latitudeDelta = getForwardAndBackRouteLatitudeDelta();
-  return (parseFloat(startLatitude) + latitudeDelta).toString();
-}
-
-function getForwardAndBackRouteLatitudeDelta() {
-  const duration = document.getElementById("duration").value;
-  const speed = document.getElementById("speed").value;
-  const distance = ((duration / 60) * speed) / 2;
-  return distance / KILOMETERS_IN_DEGREE;
-}
-
 // Strategy #2: Go North, then West, then South, then back
 function getGoNorthThenWestThenSouthThenEastCoords(startCoords) {
   const startLongitude = startCoords.longitude;
@@ -164,6 +155,18 @@ function getGoNorthThenWestThenSouthThenEastCoords(startCoords) {
   const finishLatitude = startCoords.latitude;
   const routeCoords = [{ latitude: startLatitude, longitude: startLongitude }, { latitude: northPointLatitude, longitude: northPointLongitude }, { latitude: westPointLatitude, longitude: westPointLongitude }, { latitude: eastPointLatitude, longitude: eastPointLongitude }, { latitude: finishLatitude, longitude: finishLongitude }];
   return routeCoords;
+}
+
+function getForwardAndBackRouteNorthPointLatitude(startLatitude) {
+  const latitudeDelta = getForwardAndBackRouteLatitudeOrLongitudeDelta();
+  return (parseFloat(startLatitude) + latitudeDelta).toString();
+}
+
+function getForwardAndBackRouteLatitudeOrLongitudeDelta() {
+  const duration = document.getElementById("duration").value;
+  const speed = document.getElementById("speed").value;
+  const distance = ((duration / 60) * speed) / 2;
+  return distance / KILOMETERS_IN_DEGREE;
 }
 
 function getCircleRouteNorthPointLatitude(startLatitude) {
