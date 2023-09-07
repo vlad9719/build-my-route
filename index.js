@@ -57,9 +57,11 @@ function getAverageOfTwo(first, second) {
 function getRouteCoords() {
   const startLongitude = getStartLongitude();
   const startLatitude = getStartLatitude();
-  const finishLongitude = getFinishLongitude();
-  const finishLatitude = getFinishLatitude();
-  const routeCoords = [{ latitude: startLatitude, longitude: startLongitude }, { latitude: finishLatitude, longitude: finishLongitude }];
+  const midPointLongitude = getMidPointLongitude();
+  const midPointLatitude = getMidPointLatitude();
+  const finishLongitude = getStartLongitude();
+  const finishLatitude = getStartLatitude();
+  const routeCoords = [{ latitude: startLatitude, longitude: startLongitude }, { latitude: midPointLatitude, longitude: midPointLongitude }, { latitude: finishLatitude, longitude: finishLongitude }];
   return routeCoords;
 }
 
@@ -77,14 +79,14 @@ function getStartLatitude() {
   return startLatitudeInput.value;
 }
 
-function getFinishLongitude() {
+function getMidPointLongitude() {
   return getStartLongitude();
 }
 
-function getFinishLatitude() {
+function getMidPointLatitude() {
   const startLatitude = parseFloat(getStartLatitude());
   const latitudeDelta = getLatitudeDelta();
-  return startLatitude + latitudeDelta;
+  return (startLatitude + latitudeDelta).toString();
 }
 
 function setStartLongitude(position) {
@@ -108,6 +110,6 @@ function getStartLatitudeInput() {
 function getLatitudeDelta() {
   const duration = document.getElementById("duration").value;
   const speed = document.getElementById("speed").value;
-  const distance = (duration / 60) * speed;
+  const distance = ((duration / 60) * speed) / 2;
   return distance / KILOMETERS_IN_DEGREE;
 }
