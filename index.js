@@ -1,4 +1,3 @@
-const MINUTES_IN_HOUR = 60;
 const KILOMETERS_IN_DEGREE = 111;
 
 const form = document.getElementById("coordinates");
@@ -55,14 +54,8 @@ function getAverageOfTwo(first, second) {
 }
 
 function getRouteCoords() {
-  const startLongitude = getStartLongitude();
-  const startLatitude = getStartLatitude();
-  const midPointLongitude = getMidPointLongitude();
-  const midPointLatitude = getMidPointLatitude();
-  const finishLongitude = getStartLongitude();
-  const finishLatitude = getStartLatitude();
-  const routeCoords = [{ latitude: startLatitude, longitude: startLongitude }, { latitude: midPointLatitude, longitude: midPointLongitude }, { latitude: finishLatitude, longitude: finishLongitude }];
-  return routeCoords;
+  const startCoords = { latitude: getStartLatitude(), longitude: getStartLongitude() };
+  return getGoNorthAndBackRouteCoords(startCoords);
 }
 
 function getMapUrl(routeCoords) {
@@ -77,16 +70,6 @@ function getStartLongitude() {
 function getStartLatitude() {
   const startLatitudeInput = getStartLatitudeInput();
   return startLatitudeInput.value;
-}
-
-function getMidPointLongitude() {
-  return getStartLongitude();
-}
-
-function getMidPointLatitude() {
-  const startLatitude = parseFloat(getStartLatitude());
-  const latitudeDelta = getLatitudeDelta();
-  return (startLatitude + latitudeDelta).toString();
 }
 
 function setStartLongitude(position) {
@@ -105,6 +88,24 @@ function getStartLongitudeInput() {
 
 function getStartLatitudeInput() {
   return document.getElementById("start-latitude");
+}
+
+// route strategies
+
+function getGoNorthAndBackRouteCoords(startCoords) {
+  const startLongitude = startCoords.longitude;
+  const startLatitude = startCoords.latitude;
+  const northPointLongitude = startLongitude;
+  const northPointLatitude = getNorthPointLatitude(startLatitude);
+  const finishLongitude = startCoords.longitude;
+  const finishLatitude = startCoords.latitude;
+  const routeCoords = [{ latitude: startLatitude, longitude: startLongitude }, { latitude: northPointLatitude, longitude: northPointLongitude }, { latitude: finishLatitude, longitude: finishLongitude }];
+  return routeCoords;
+}
+
+function getNorthPointLatitude(startLatitude) {
+  const latitudeDelta = getLatitudeDelta();
+  return (parseFloat(startLatitude) + latitudeDelta).toString();
 }
 
 function getLatitudeDelta() {
