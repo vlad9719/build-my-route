@@ -131,42 +131,25 @@ function getAverageOfTwo(first, second) {
 
 // Strategy #1: Go North and back
 function getGoNorthAndBackRouteCoords(startCoords) {
-  const startLongitude = startCoords.longitude;
-  const startLatitude = startCoords.latitude;
-  const northPointLongitude = startLongitude;
-  const northPointLatitude = getForwardAndBackRouteNorthPointLatitude(startLatitude);
-  const finishLongitude = startCoords.longitude;
-  const finishLatitude = startCoords.latitude;
-  const routeCoords = [{ latitude: startLatitude, longitude: startLongitude }, { latitude: northPointLatitude, longitude: northPointLongitude }, { latitude: finishLatitude, longitude: finishLongitude }];
-  return routeCoords;
+  const northPointLongitude = startCoords.longitude;
+  const northPointLatitude = getForwardAndBackRouteNorthPointLatitude(startCoords.latitude);
+  return [{ latitude: startCoords.latitude, longitude: startCoords.longitude }, { latitude: northPointLatitude, longitude: northPointLongitude }, { latitude: startCoords.latitude, longitude: startCoords.longitude }];
 }
 
 // Strategy #2: Go North, then West, then South, then back
 function getGoNorthThenWestThenSouthThenEastCoords(startCoords) {
-  const startLongitude = startCoords.longitude;
-  const startLatitude = startCoords.latitude;
-  const northPointLongitude = startLongitude;
-  const northPointLatitude = getCircleRouteNorthPointLatitude(startLatitude);
-  const westPointLongitude = getCircleRouteWestPointLongitude(startLongitude);
-  const westPointLatitude = northPointLatitude;
-  const eastPointLongitude = westPointLongitude;
-  const eastPointLatitude = startLatitude;
-  const finishLongitude = startCoords.longitude;
-  const finishLatitude = startCoords.latitude;
-  const routeCoords = [{ latitude: startLatitude, longitude: startLongitude }, { latitude: northPointLatitude, longitude: northPointLongitude }, { latitude: westPointLatitude, longitude: westPointLongitude }, { latitude: eastPointLatitude, longitude: eastPointLongitude }, { latitude: finishLatitude, longitude: finishLongitude }];
-  return routeCoords;
+  const northEastPointLongitude = startCoords.longitude;
+  const northEastPointLatitude = getCircleRouteNorthPointLatitude(startCoords.latitude);
+  const northWestPointLongitude = getCircleRouteWestPointLongitude(startCoords.longitude);
+  const northWestPointLatitude = northEastPointLatitude;
+  const southWestPointLongitude = northWestPointLongitude;
+  const southWestPointLatitude = startCoords.latitude;
+  return [{ latitude: startCoords.latitude, longitude: startCoords.longitude }, { latitude: northEastPointLatitude, longitude: northEastPointLongitude }, { latitude: northWestPointLatitude, longitude: northWestPointLongitude }, { latitude: southWestPointLatitude, longitude: southWestPointLongitude }, { latitude: startCoords.latitude, longitude: startCoords.longitude }];
 }
 
 function getForwardAndBackRouteNorthPointLatitude(startLatitude) {
   const latitudeDelta = getForwardAndBackRouteLatitudeOrLongitudeDelta();
   return (parseFloat(startLatitude) + latitudeDelta).toString();
-}
-
-function getForwardAndBackRouteLatitudeOrLongitudeDelta() {
-  const duration = document.getElementById("duration").value;
-  const speed = document.getElementById("speed").value;
-  const distance = ((duration / 60) * speed) / 2;
-  return distance / KILOMETERS_IN_DEGREE;
 }
 
 function getCircleRouteNorthPointLatitude(startLatitude) {
@@ -179,9 +162,24 @@ function getCircleRouteWestPointLongitude(startLongitude) {
   return (parseFloat(startLongitude) - longitudeDelta).toString();
 }
 
+function getForwardAndBackRouteLatitudeOrLongitudeDelta() {
+  const duration = getDurationValue();
+  const speed = getSpeedValue();
+  const distance = ((duration / 60) * speed) / 2;
+  return distance / KILOMETERS_IN_DEGREE;
+}
+
 function getCircleRouteLatitudeOrLongitudeDelta() {
-  const duration = document.getElementById("duration").value;
-  const speed = document.getElementById("speed").value;
+  const duration = getDurationValue();
+  const speed = getSpeedValue();
   const distance = ((duration / 60) * speed) / 4;
   return distance / KILOMETERS_IN_DEGREE;
+}
+
+function getDurationValue() {
+  return document.getElementById("duration").value;
+}
+
+function getSpeedValue() {
+  return document.getElementById("speed").value;
 }
