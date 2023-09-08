@@ -226,56 +226,54 @@ function getGoSouthThenWestThenNorthThenEastCoords(startCoords) {
 }
 
 function getForwardAndBackRouteNorthPointLatitude(startLatitude) {
-  const latitudeDelta = getForwardAndBackRouteLatitudeOrLongitudeDelta();
+  const latitudeDelta = getLongitudeOrLatitudeDeltaByRouteType("FORWARD_AND_BACK");
   return (parseFloat(startLatitude) + latitudeDelta).toString();
 }
 
 function getForwardAndBackRouteSouthPointLatitude(startLatitude) {
-  const latitudeDelta = getForwardAndBackRouteLatitudeOrLongitudeDelta();
+  const latitudeDelta = getLongitudeOrLatitudeDeltaByRouteType("FORWARD_AND_BACK");
   return (parseFloat(startLatitude) - latitudeDelta).toString();
 }
 
 function getForwardAndBackRouteEastPointLongitude(startLongitude) {
-  const longitudeDelta = getForwardAndBackRouteLatitudeOrLongitudeDelta();
+  const longitudeDelta = getLongitudeOrLatitudeDeltaByRouteType("FORWARD_AND_BACK");
   return (parseFloat(startLongitude) + longitudeDelta).toString();
 }
 
 function getForwardAndBackRouteWestPointLongitude(startLongitude) {
-  const longitudeDelta = getForwardAndBackRouteLatitudeOrLongitudeDelta();
+  const longitudeDelta = getLongitudeOrLatitudeDeltaByRouteType("FORWARD_AND_BACK");
   return (parseFloat(startLongitude) - longitudeDelta).toString();
 }
 
 function getCircleRouteNorthPointLatitude(startLatitude) {
-  const latitudeDelta = getCircleRouteLatitudeOrLongitudeDelta();
+  const latitudeDelta = getLongitudeOrLatitudeDeltaByRouteType("CIRCLE");
   return (parseFloat(startLatitude) + latitudeDelta).toString();
 }
 
 function getCircleRouteWestPointLongitude(startLongitude) {
-  const longitudeDelta = getCircleRouteLatitudeOrLongitudeDelta();
+  const longitudeDelta = getLongitudeOrLatitudeDeltaByRouteType("CIRCLE");
   return (parseFloat(startLongitude) - longitudeDelta).toString();
 }
 
 function getCircleRouteEastPointLongitude(startLongitude) {
-  const longitudeDelta = getCircleRouteLatitudeOrLongitudeDelta();
+  const longitudeDelta = getLongitudeOrLatitudeDeltaByRouteType("CIRCLE");
   return (parseFloat(startLongitude) + longitudeDelta).toString();
 }
 
 function getCircleRouteSouthPointLatitude(startLatitude) {
-  const latitudeDelta = getCircleRouteLatitudeOrLongitudeDelta();
+  const latitudeDelta = getLongitudeOrLatitudeDeltaByRouteType("CIRCLE");
   return (parseFloat(startLatitude) - latitudeDelta).toString();
 }
 
-function getForwardAndBackRouteLatitudeOrLongitudeDelta() {
-  const duration = getDurationValue();
-  const speed = getSpeedValue();
-  const distance = ((duration / 60) * speed) / 2;
-  return distance / KILOMETERS_IN_DEGREE;
-}
+const ROUTE_TYPE_DIVIDER = {
+  "FORWARD_AND_BACK": 2,
+  "CIRCLE": 4
+};
 
-function getCircleRouteLatitudeOrLongitudeDelta() {
+function getLongitudeOrLatitudeDeltaByRouteType(routeType) {
   const duration = getDurationValue();
   const speed = getSpeedValue();
-  const distance = ((duration / 60) * speed) / 4;
+  const distance = ((duration / 60) * speed) / ROUTE_TYPE_DIVIDER[routeType];
   return distance / KILOMETERS_IN_DEGREE;
 }
 
