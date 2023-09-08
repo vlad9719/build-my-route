@@ -5,6 +5,18 @@ const strategies = [{
   getRouteCoordinates: getGoNorthAndBackRouteCoords,
   isUsed: false
 }, {
+  name: "SOUTH_AND_BACK",
+  getRouteCoordinates: getGoSouthAndBackRouteCoords,
+  isUsed: false
+}, {
+  name: "EAST_AND_BACK",
+  getRouteCoordinates: getGoEastAndBackRouteCoords,
+  isUsed: false
+}, {
+  name: "WEST_AND_BACK",
+  getRouteCoordinates: getGoWestAndBackRouteCoords,
+  isUsed: false
+}, {
   name: "NORTH_AND_WEST_AND_SOUTH_AND_BACK",
   getRouteCoordinates: getGoNorthThenWestThenSouthThenEastCoords,
   isUsed: false
@@ -129,14 +141,35 @@ function getAverageOfTwo(first, second) {
 
 // route strategies
 
-// Strategy #1: Go North and back
+// Strategy: Go North and Back
 function getGoNorthAndBackRouteCoords(startCoords) {
   const northPointLongitude = startCoords.longitude;
   const northPointLatitude = getForwardAndBackRouteNorthPointLatitude(startCoords.latitude);
   return [{ latitude: startCoords.latitude, longitude: startCoords.longitude }, { latitude: northPointLatitude, longitude: northPointLongitude }, { latitude: startCoords.latitude, longitude: startCoords.longitude }];
 }
 
-// Strategy #2: Go North, then West, then South, then back
+// Strategy: Go South and Back
+function getGoSouthAndBackRouteCoords(startCoords) {
+  const southPointLongitude = startCoords.longitude;
+  const southPointLatitude = getForwardAndBackRouteSouthPointLatitude(startCoords.latitude);
+  return [{ latitude: startCoords.latitude, longitude: startCoords.longitude }, { latitude: southPointLatitude, longitude: southPointLongitude }, { latitude: startCoords.latitude, longitude: startCoords.longitude }];
+}
+
+// Strategy: Go East and Back
+function getGoEastAndBackRouteCoords(startCoords) {
+  const eastPointLongitude = getForwardAndBackRouteEastPointLongitude(startCoords.longitude);
+  const eastPointLatitude = startCoords.latitude;
+  return [{ latitude: startCoords.latitude, longitude: startCoords.longitude }, { latitude: eastPointLatitude, longitude: eastPointLongitude }, { latitude: startCoords.latitude, longitude: startCoords.longitude }];
+}
+
+// Strategy: Go West and Back
+function getGoWestAndBackRouteCoords(startCoords) {
+  const westPointLongitude = getForwardAndBackRouteWestPointLongitude(startCoords.longitude);
+  const westPointLatitude = startCoords.latitude;
+  return [{ latitude: startCoords.latitude, longitude: startCoords.longitude }, { latitude: westPointLatitude, longitude: westPointLongitude }, { latitude: startCoords.latitude, longitude: startCoords.longitude }];
+}
+
+// Strategy: Go North, then West, then South, then Back
 function getGoNorthThenWestThenSouthThenEastCoords(startCoords) {
   const northEastPointLongitude = startCoords.longitude;
   const northEastPointLatitude = getCircleRouteNorthPointLatitude(startCoords.latitude);
@@ -150,6 +183,21 @@ function getGoNorthThenWestThenSouthThenEastCoords(startCoords) {
 function getForwardAndBackRouteNorthPointLatitude(startLatitude) {
   const latitudeDelta = getForwardAndBackRouteLatitudeOrLongitudeDelta();
   return (parseFloat(startLatitude) + latitudeDelta).toString();
+}
+
+function getForwardAndBackRouteSouthPointLatitude(startLatitude) {
+  const latitudeDelta = getForwardAndBackRouteLatitudeOrLongitudeDelta();
+  return (parseFloat(startLatitude) - latitudeDelta).toString();
+}
+
+function getForwardAndBackRouteEastPointLongitude(startLongitude) {
+  const longitudeDelta = getForwardAndBackRouteLatitudeOrLongitudeDelta();
+  return (parseFloat(startLongitude) + longitudeDelta).toString();
+}
+
+function getForwardAndBackRouteWestPointLongitude(startLongitude) {
+  const longitudeDelta = getForwardAndBackRouteLatitudeOrLongitudeDelta();
+  return (parseFloat(startLongitude) - longitudeDelta).toString();
 }
 
 function getCircleRouteNorthPointLatitude(startLatitude) {
