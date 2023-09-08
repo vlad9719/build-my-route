@@ -24,6 +24,14 @@ const strategies = [{
   name: "NORTH_AND_EAST_AND_SOUTH_AND_BACK",
   getRouteCoordinates: getGoNorthThenEastThenSouthThenWestCoords,
   isUsed: false
+}, {
+  name: "SOUTH_AND_EAST_AND_NORTH_AND_BACK",
+  getRouteCoordinates: getGoSouthThenEastThenNorthThenWestCoords,
+  isUsed: false
+}, {
+  name: "SOUTH_AND_WEST_AND_NORTH_AND_BACK",
+  getRouteCoordinates: getGoSouthThenWestThenNorthThenEastCoords,
+  isUsed: false
 }];
 
 const form = document.getElementById("coordinates");
@@ -195,6 +203,28 @@ function getGoNorthThenEastThenSouthThenWestCoords(startCoords) {
   return [{ latitude: startCoords.latitude, longitude: startCoords.longitude }, { latitude: northWestPointLatitude, longitude: northWestPointLongitude }, { latitude: northEastPointLatitude, longitude: northEastPointLongitude }, { latitude: southEastPointLatitude, longitude: southEastPointLongitude }, { latitude: startCoords.latitude, longitude: startCoords.longitude }];
 }
 
+// Strategy: Go South, then East, then North, then Back
+function getGoSouthThenEastThenNorthThenWestCoords(startCoords) {
+  const southWestPointLongitude = startCoords.longitude;
+  const southWestPointLatitude = getCircleRouteSouthPointLatitude(startCoords.latitude);
+  const southEastPointLongitude = getCircleRouteEastPointLongitude(startCoords.longitude);
+  const southEastPointLatitude = southWestPointLatitude;
+  const northEastPointLongitude = southEastPointLongitude;
+  const northEastPointLatitude = startCoords.latitude;
+  return [{ latitude: startCoords.latitude, longitude: startCoords.longitude }, { latitude: southWestPointLatitude, longitude: southWestPointLongitude }, { latitude: southEastPointLatitude, longitude: southEastPointLongitude }, { latitude: northEastPointLatitude, longitude: northEastPointLongitude }, { latitude: startCoords.latitude, longitude: startCoords.longitude }];
+}
+
+// Strategy: Go South, then West, then North, then Back
+function getGoSouthThenWestThenNorthThenEastCoords(startCoords) {
+  const southEastPointLongitude = startCoords.longitude;
+  const southEastPointLatitude = getCircleRouteSouthPointLatitude(startCoords.latitude);
+  const southWestPointLongitude = getCircleRouteWestPointLongitude(startCoords.longitude);
+  const southWestPointLatitude = southEastPointLatitude;
+  const northWestPointLongitude = southWestPointLongitude;
+  const northWestPointLatitude = startCoords.latitude;
+  return [{ latitude: startCoords.latitude, longitude: startCoords.longitude }, { latitude: southEastPointLatitude, longitude: southEastPointLongitude }, { latitude: southWestPointLatitude, longitude: southWestPointLongitude }, { latitude: northWestPointLatitude, longitude: northWestPointLongitude }, { latitude: startCoords.latitude, longitude: startCoords.longitude }];
+}
+
 function getForwardAndBackRouteNorthPointLatitude(startLatitude) {
   const latitudeDelta = getForwardAndBackRouteLatitudeOrLongitudeDelta();
   return (parseFloat(startLatitude) + latitudeDelta).toString();
@@ -228,6 +258,11 @@ function getCircleRouteWestPointLongitude(startLongitude) {
 function getCircleRouteEastPointLongitude(startLongitude) {
   const longitudeDelta = getCircleRouteLatitudeOrLongitudeDelta();
   return (parseFloat(startLongitude) + longitudeDelta).toString();
+}
+
+function getCircleRouteSouthPointLatitude(startLatitude) {
+  const latitudeDelta = getCircleRouteLatitudeOrLongitudeDelta();
+  return (parseFloat(startLatitude) - latitudeDelta).toString();
 }
 
 function getForwardAndBackRouteLatitudeOrLongitudeDelta() {
